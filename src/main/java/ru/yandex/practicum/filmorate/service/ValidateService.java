@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.models.Film;
 import ru.yandex.practicum.filmorate.models.User;
@@ -9,7 +9,7 @@ import ru.yandex.practicum.filmorate.models.User;
 import java.time.LocalDate;
 
 @Slf4j
-@Component
+@Service
 public class ValidateService {
     public void validateFilm(Film film) {
         if (film.getDescription().length() > 200) {
