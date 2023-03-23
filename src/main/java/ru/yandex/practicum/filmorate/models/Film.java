@@ -7,6 +7,8 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @Builder
@@ -17,6 +19,7 @@ public class Film {
     private String description;
     @NotNull
     private long id;
+    private int rate;
     @Builder.Default
     @NotNull
     private LocalDate releaseDate = LocalDate.now();
@@ -24,4 +27,7 @@ public class Film {
     @NotNull
     @Min(1)
     private long duration = 1;
+    @Builder.Default
+    private long likes = 0;
+    private final Set<Long> usersLiked = new HashSet<>();
 }
