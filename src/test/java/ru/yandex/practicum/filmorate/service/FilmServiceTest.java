@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.models.Film;
 import ru.yandex.practicum.filmorate.models.User;
@@ -12,12 +13,18 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FilmServiceTest {
-    private final UserService userService = new UserService(new InMemoryUserStorage());
-    private final FilmService filmService = new FilmService(new InMemoryFilmStorage());
+    private UserService userService;
+    private FilmService filmService;
+    Film film1;
+    Film film2;
+    Film film3;
+    User user1;
 
-    @Test
-    public void addingAndDeletingLikes() {
-        Film film1 = Film.builder()
+    @BeforeEach
+    public void updateTestData() {
+        userService = new UserService(new InMemoryUserStorage());
+        filmService = new FilmService(new InMemoryFilmStorage());
+        film1 = Film.builder()
                 .id(1)
                 .name("film1")
                 .description("description1")
@@ -25,7 +32,7 @@ public class FilmServiceTest {
                 .releaseDate(LocalDate.now())
                 .duration(100)
                 .build();
-        Film film2 = Film.builder()
+        film2 = Film.builder()
                 .id(2)
                 .name("film2")
                 .description("description2")
@@ -33,15 +40,47 @@ public class FilmServiceTest {
                 .releaseDate(LocalDate.now())
                 .duration(100)
                 .build();
-        filmService.add(film1);
-        filmService.add(film2);
-        User user1 = User.builder()
+        user1 = User.builder()
                 .id(1)
                 .name("person1")
                 .login("login1")
                 .email("email1@mail.com")
                 .birthday(LocalDate.MIN)
                 .build();
+        film3 = Film.builder()
+                .id(1)
+                .name("film3")
+                .description("description3")
+                .rate(4)
+                .releaseDate(LocalDate.now())
+                .duration(100)
+                .build();
+    }
+
+    @Test
+    public void addingFilm() {
+        filmService.add(film1);
+        filmService.add(film2);
+        List<Film> films = filmService.findAll();
+        assertEquals(List.of(film1, film2), films);
+    }
+
+    @Test
+    public void updatingFilm() {
+        filmService.add(film1);
+        filmService.add(film2);
+        List<Film> films = filmService.findAll();
+        assertEquals(List.of(film1, film2), films);
+
+        filmService.update(film3);
+        films = filmService.findAll();
+        assertEquals(List.of(film3, film2), films);
+    }
+
+    @Test
+    public void addingAndDeletingLikesAndGettingPopularFilms() {
+        filmService.add(film1);
+        filmService.add(film2);
         userService.add(user1);
         assertEquals(0, film1.getLikes());
         assertEquals(0, film2.getLikes());
@@ -54,18 +93,5 @@ public class FilmServiceTest {
         filmService.deleteLike(1, 2);
         assertEquals(0, film1.getLikes());
         assertEquals(0, film2.getLikes());
-        List<Film> films = filmService.findAll();
-        assertEquals(List.of(film1, film2), films);
-        Film film3 = Film.builder()
-                .id(1)
-                .name("film3")
-                .description("description3")
-                .rate(4)
-                .releaseDate(LocalDate.now())
-                .duration(100)
-                .build();
-        filmService.update(film3);
-        films = filmService.findAll();
-        assertEquals(List.of(film3, film2), films);
     }
 }

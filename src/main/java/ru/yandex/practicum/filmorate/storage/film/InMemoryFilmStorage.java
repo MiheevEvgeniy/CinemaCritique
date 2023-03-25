@@ -16,7 +16,6 @@ public class InMemoryFilmStorage implements FilmStorage {
     private int id = 0;
     private final Map<Long, Film> films = new HashMap<>();
 
-    @Override
     public long generateId() {
         return ++id;
     }
@@ -25,18 +24,18 @@ public class InMemoryFilmStorage implements FilmStorage {
     public Film add(Film film) {
         film.setId(generateId());
         films.put(film.getId(), film);
-        log.info("Film added.");
+        log.info("Фильм добавлен");
         return film;
     }
 
     @Override
     public Film update(Film film) {
         if (!films.containsKey(film.getId())) {
-            log.error("Film not found.");
+            log.error("Фильм не найден");
             throw new UpdateException();
         }
         films.put(film.getId(), film);
-        log.info("Film updated.");
+        log.info("Фильм обновлен");
         return film;
     }
 
@@ -49,8 +48,10 @@ public class InMemoryFilmStorage implements FilmStorage {
     public Film getFilm(long id) {
         Film film = films.get(id);
         if (film == null) {
-            throw new NullPointerException();
+            log.error("Фильм не найден");
+            throw new NullPointerException("Фильм не найден");
         }
+        log.info("Фильм найден");
         return film;
     }
 }

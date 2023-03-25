@@ -5,7 +5,6 @@ import ru.yandex.practicum.filmorate.models.Film;
 import java.util.List;
 
 interface FilmStorage {
-    long generateId();
 
     Film add(Film film);
 

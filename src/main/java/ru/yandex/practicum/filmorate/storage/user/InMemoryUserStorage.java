@@ -16,7 +16,6 @@ public class InMemoryUserStorage implements UserStorage {
     private int id = 0;
     private final Map<Long, User> users = new HashMap<>();
 
-    @Override
     public long generateId() {
         return ++id;
     }
@@ -24,29 +23,27 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User add(User user) {
         user.setId(generateId());
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
         users.put(user.getId(), user);
-        log.info("User added.");
+        log.info("Пользователь добавлен");
         return user;
     }
 
     @Override
     public User update(User user) {
         if (!users.containsKey(user.getId())) {
-            log.error("User not found.");
-            throw new UpdateException();
+            log.error("Пользователь не найден");
+            throw new UpdateException("Ошибка обновления пользователя");
         }
         users.put(user.getId(), user);
-        log.info("User updated.");
+        log.info("Пользователь обновлен");
         return user;
     }
 
     @Override
     public User getUser(long id) {
         if (users.get(id) == null) {
-            throw new NullPointerException();
+            log.error("Пользователь не найден");
+            throw new NullPointerException("Пользователь не найден");
         }
         return users.get(id);
     }

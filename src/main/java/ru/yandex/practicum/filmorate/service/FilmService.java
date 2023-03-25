@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.models.Film;
@@ -11,6 +12,7 @@ import java.util.Comparator;
 import java.util.List;
 
 @Service
+@Slf4j
 public class FilmService {
     private final InMemoryFilmStorage storage;
 
@@ -23,6 +25,7 @@ public class FilmService {
         Film film = storage.getFilm(id);
         film.setLikes(film.getLikes() + 1);
         film.getUsersLiked().add(userId);
+        log.info("Лайк добавлен");
         return film;
     }
 
@@ -31,10 +34,11 @@ public class FilmService {
         if (film.getLikes() > 0) {
             film.setLikes(film.getLikes() - 1);
             film.getUsersLiked().remove(userId);
+            log.info("Лайк удален");
             return film;
-        } else {
-            throw new NullPointerException();
         }
+        log.error("Количество лайков <= 0. Удаление невозможно");
+        return null;
     }
 
     public List<Film> getPopularFilms(int count) {
@@ -42,13 +46,14 @@ public class FilmService {
         films.sort(Comparator.comparingLong(Film::getLikes));
         Collections.reverse(films);
         List<Film> topFilms = new ArrayList<>();
-
+        log.info("Список фильмов отсортирован по лайкам");
         if (count > films.size()) {
             count = films.size();
         }
         for (int i = 0; i < count; i++) {
             topFilms.add(films.get(i));
         }
+        log.info("Список из {} популярных фильмов получен", count);
         return topFilms;
     }
 
