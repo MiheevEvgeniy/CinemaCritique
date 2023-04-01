@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.models.FriendshipStatus;
 import ru.yandex.practicum.filmorate.models.User;
 import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
@@ -24,8 +25,8 @@ public class UserService {
         User user = getUser(id);
         User friend = getUser(friendId);
         log.info("Пользователи найдены");
-        user.getFriends().add(friend.getId());
-        friend.getFriends().add(user.getId());
+        user.getFriends().put(friend.getId(), FriendshipStatus.NOT_CONFIRMED);
+        friend.getFriends().put(user.getId(),FriendshipStatus.NOT_CONFIRMED);
         log.info("Пользователи теперь друзья");
     }
 
@@ -46,8 +47,8 @@ public class UserService {
             log.info("У одного или обоих пользователей нет друзей. Возвращен пустой список общих друзей");
             return Collections.emptyList();
         }
-        List<Long> commonIds = new ArrayList<>(user1.getFriends());
-        commonIds.retainAll(user2.getFriends());
+        List<Long> commonIds = new ArrayList<>(user1.getFriends().keySet());
+        commonIds.retainAll(user2.getFriends().keySet());
         log.info("Списки друзей сравнены и получены id общих друзей");
         List<User> commonUser = new ArrayList<>();
         for (long commonId : commonIds) {
@@ -75,7 +76,7 @@ public class UserService {
             log.info("У пользователя нет друзей");
             return Collections.emptyList();
         }
-        for (long friendId : user.getFriends()) {
+        for (long friendId : user.getFriends().keySet()) {
             friends.add(getUser(friendId));
         }
         log.info("Друзья получены");

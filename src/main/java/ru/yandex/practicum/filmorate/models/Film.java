@@ -21,6 +21,10 @@ public class Film {
     @NotNull
     private long id;
     private int rate;
+    @NotNull
+    private Genres genre;
+    @NotNull
+    private Rating rating;
     @Builder.Default
     @NotNull
     private LocalDate releaseDate = LocalDate.now();
