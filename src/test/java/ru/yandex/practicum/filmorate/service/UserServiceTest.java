@@ -2,13 +2,12 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ru.yandex.practicum.filmorate.dao.user.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.models.User;
-import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -78,16 +77,15 @@ public class UserServiceTest {
     public void addingAndDeletingFriends() {
         userService.add(user1);
         userService.add(user2);
-        assertEquals(Collections.emptySet(), user1.getFriends());
-        assertEquals(Collections.emptySet(), user2.getFriends());
+        assertEquals(Collections.emptyList(), user1.getFriends());
+        assertEquals(Collections.emptyList(), user2.getFriends());
 
         userService.addFriend(user1.getId(), user2.getId());
-        assertEquals(Set.of(2L), user1.getFriends());
-        assertEquals(Set.of(1L), user2.getFriends());
+        assertEquals(List.of(2L), user1.getFriends());
 
         userService.deleteFriend(user1.getId(), user2.getId());
-        assertEquals(Collections.emptySet(), user1.getFriends());
-        assertEquals(Collections.emptySet(), user2.getFriends());
+        assertEquals(Collections.emptyList(), user1.getFriends());
+        assertEquals(Collections.emptyList(), user2.getFriends());
 
         userService.add(user3);
         userService.addFriend(user1.getId(), user2.getId());

@@ -1,14 +1,11 @@
-package ru.yandex.practicum.filmorate.storage.user;
+package ru.yandex.practicum.filmorate.dao.user;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.UpdateException;
 import ru.yandex.practicum.filmorate.models.User;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 @Slf4j
@@ -40,12 +37,12 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User getUser(long id) {
+    public Optional<User> getUser(long id) {
         if (users.get(id) == null) {
             log.error("Пользователь не найден");
             throw new NullPointerException("Пользователь не найден");
         }
-        return users.get(id);
+        return Optional.of(users.get(id));
     }
 
     @Override

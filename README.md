@@ -1,6 +1,6 @@
 # java-filmorate
 ER-diagram для проекта:<br/>
-![ERD-filmorate.png](src%2Fmain%2Fresources%2FERD-filmorate.png)<br/>
+![ERD-filmorate.png](src%2Fmain%2Fresources%2FER-diagram.png)<br/>
 URL: https://app.quickdatabasediagrams.com/#/d/KW9QbH
 <h3>Описание диаграммы:<br/>
 ---

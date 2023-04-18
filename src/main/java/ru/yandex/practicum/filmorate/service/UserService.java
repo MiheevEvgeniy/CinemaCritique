@@ -2,10 +2,11 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.models.FriendshipStatus;
+import ru.yandex.practicum.filmorate.dao.user.UserStorage;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundDataException;
 import ru.yandex.practicum.filmorate.models.User;
-import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,10 +15,11 @@ import java.util.List;
 @Service
 @Slf4j
 public class UserService {
-    private final InMemoryUserStorage storage;
 
-    @Autowired
-    public UserService(InMemoryUserStorage userStorage) {
+    private final UserStorage storage;
+
+
+    public UserService(@Autowired @Qualifier("userDbStorage") UserStorage userStorage) {
         this.storage = userStorage;
     }
 
@@ -25,8 +27,9 @@ public class UserService {
         User user = getUser(id);
         User friend = getUser(friendId);
         log.info("Пользователи найдены");
-        user.getFriends().put(friend.getId(), FriendshipStatus.NOT_CONFIRMED);
-        friend.getFriends().put(user.getId(),FriendshipStatus.NOT_CONFIRMED);
+        user.getFriends().add(friend.getId());
+        //friend.getFriends().put(user.getId(),FriendshipStatus.NOT_CONFIRMED);
+        update(user);
         log.info("Пользователи теперь друзья");
     }
 
@@ -35,7 +38,8 @@ public class UserService {
         User friend = getUser(friendId);
         log.info("Пользователи найдены");
         user.getFriends().remove(friend.getId());
-        friend.getFriends().remove(user.getId());
+        //friend.getFriends().remove(user.getId());
+        update(user);
         log.info("Пользователи больше не друзья");
     }
 
@@ -47,12 +51,16 @@ public class UserService {
             log.info("У одного или обоих пользователей нет друзей. Возвращен пустой список общих друзей");
             return Collections.emptyList();
         }
-        List<Long> commonIds = new ArrayList<>(user1.getFriends().keySet());
-        commonIds.retainAll(user2.getFriends().keySet());
+        List<Long> commonIds = user1.getFriends();
+        commonIds.retainAll(user2.getFriends());
         log.info("Списки друзей сравнены и получены id общих друзей");
         List<User> commonUser = new ArrayList<>();
         for (long commonId : commonIds) {
-            commonUser.add(storage.getUser(commonId));
+            if (storage.getUser(commonId).isPresent()) {
+                if (storage.getUser(commonId).isPresent()) {
+                    commonUser.add(storage.getUser(commonId).get());
+                }
+            }
         }
         log.info("По id друзей сформирован список общих друзей-объектов");
         return commonUser;
@@ -70,13 +78,15 @@ public class UserService {
         return storage.update(user);
     }
 
-    public List<User> getFriends(User user) {
+    public List<User> getFriends(long id) {
+        User user = getUser(id);
+        System.out.println(user.getFriends());
         List<User> friends = new ArrayList<>();
         if (user.getFriends() == null) {
             log.info("У пользователя нет друзей");
             return Collections.emptyList();
         }
-        for (long friendId : user.getFriends().keySet()) {
+        for (long friendId : user.getFriends()) {
             friends.add(getUser(friendId));
         }
         log.info("Друзья получены");
@@ -84,7 +94,10 @@ public class UserService {
     }
 
     public User getUser(long id) {
-        return storage.getUser(id);
+        if (storage.getUser(id).isPresent()) {
+            return storage.getUser(id).get();
+        }
+        throw new NotFoundDataException();
     }
 
     public List<User> findAll() {

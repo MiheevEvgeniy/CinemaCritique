@@ -5,6 +5,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundDataException;
+import ru.yandex.practicum.filmorate.exceptions.UpdateException;
 
 import javax.validation.ValidationException;
 
@@ -18,9 +20,9 @@ public class ErrorHandler {
         return new ErrorResponse("Validation exception " + e.getMessage(), e.getStackTrace());
     }
 
-    @ExceptionHandler
+    @ExceptionHandler({NullPointerException.class, UpdateException.class, NotFoundDataException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse notFound(final NullPointerException e) {
+    public ErrorResponse notFound(final Exception e) {
         log.error("404 {}", e.getMessage());
         return new ErrorResponse("Object not found " + e.getMessage(), e.getStackTrace());
     }

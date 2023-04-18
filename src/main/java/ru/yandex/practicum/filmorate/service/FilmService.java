@@ -2,9 +2,11 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dao.film.FilmStorage;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundDataException;
 import ru.yandex.practicum.filmorate.models.Film;
-import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,15 +16,15 @@ import java.util.List;
 @Service
 @Slf4j
 public class FilmService {
-    private final InMemoryFilmStorage storage;
 
-    @Autowired
-    public FilmService(InMemoryFilmStorage storage) {
+    private final FilmStorage storage;
+
+    public FilmService(@Autowired @Qualifier("filmDbStorage") FilmStorage storage) {
         this.storage = storage;
     }
 
     public Film addLike(long userId, long id) {
-        Film film = storage.getFilm(id);
+        Film film = getFilm(id);
         film.setLikes(film.getLikes() + 1);
         film.getUsersLiked().add(userId);
         log.info("Лайк добавлен");
@@ -30,7 +32,7 @@ public class FilmService {
     }
 
     public Film deleteLike(long userId, long id) {
-        Film film = storage.getFilm(id);
+        Film film = getFilm(id);
         if (film.getLikes() > 0) {
             film.setLikes(film.getLikes() - 1);
             film.getUsersLiked().remove(userId);
@@ -42,7 +44,7 @@ public class FilmService {
     }
 
     public List<Film> getPopularFilms(int count) {
-        List<Film> films = storage.findAll();
+        List<Film> films = findAll();
         films.sort(Comparator.comparingLong(Film::getLikes));
         Collections.reverse(films);
         List<Film> topFilms = new ArrayList<>();
@@ -70,6 +72,9 @@ public class FilmService {
     }
 
     public Film getFilm(long id) {
-        return storage.getFilm(id);
+        if (storage.getFilm(id).isPresent()) {
+            return storage.getFilm(id).get();
+        }
+        throw new NotFoundDataException();
     }
 }
