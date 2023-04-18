@@ -2,60 +2,53 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.models.FriendshipStatus;
+import ru.yandex.practicum.filmorate.dao.friends.FriendsStorage;
+import ru.yandex.practicum.filmorate.dao.user.UserStorage;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundDataException;
 import ru.yandex.practicum.filmorate.models.User;
-import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
 public class UserService {
-    private final InMemoryUserStorage storage;
 
-    @Autowired
-    public UserService(InMemoryUserStorage userStorage) {
+    private final UserStorage storage;
+
+    private final FriendsStorage friendsStorage;
+
+
+    public UserService(@Autowired @Qualifier("userDbStorage") UserStorage userStorage,
+                       @Autowired @Qualifier("friendsDbStorage") FriendsStorage friendsStorage) {
         this.storage = userStorage;
+        this.friendsStorage = friendsStorage;
     }
 
     public void addFriend(long id, long friendId) {
         User user = getUser(id);
         User friend = getUser(friendId);
-        log.info("Пользователи найдены");
-        user.getFriends().put(friend.getId(), FriendshipStatus.NOT_CONFIRMED);
-        friend.getFriends().put(user.getId(),FriendshipStatus.NOT_CONFIRMED);
+        if (user == null || friend == null) {
+            throw new NotFoundDataException("Пользователь не найден. Дружба невозможна.");
+        }
+        friendsStorage.add(id, friendId);
         log.info("Пользователи теперь друзья");
     }
 
     public void deleteFriend(long id, long friendId) {
         User user = getUser(id);
-        User friend = getUser(friendId);
-        log.info("Пользователи найдены");
-        user.getFriends().remove(friend.getId());
-        friend.getFriends().remove(user.getId());
+        User friend = getUser(id);
+        if (user == null || friend == null) {
+            throw new NotFoundDataException("Пользователь не найден. Дружба невозможна.");
+        }
+        friendsStorage.delete(id, friendId);
         log.info("Пользователи больше не друзья");
     }
 
     public List<User> getCommonFriends(long id, long friendId) {
-        User user1 = getUser(id);
-        User user2 = getUser(friendId);
-        log.info("Пользователи получены");
-        if (user1.getFriends() == null || user2.getFriends() == null) {
-            log.info("У одного или обоих пользователей нет друзей. Возвращен пустой список общих друзей");
-            return Collections.emptyList();
-        }
-        List<Long> commonIds = new ArrayList<>(user1.getFriends().keySet());
-        commonIds.retainAll(user2.getFriends().keySet());
-        log.info("Списки друзей сравнены и получены id общих друзей");
-        List<User> commonUser = new ArrayList<>();
-        for (long commonId : commonIds) {
-            commonUser.add(storage.getUser(commonId));
-        }
-        log.info("По id друзей сформирован список общих друзей-объектов");
-        return commonUser;
+        return friendsStorage.getCommonFriends(id, friendId);
     }
 
     public User add(User user) {
@@ -70,21 +63,16 @@ public class UserService {
         return storage.update(user);
     }
 
-    public List<User> getFriends(User user) {
-        List<User> friends = new ArrayList<>();
-        if (user.getFriends() == null) {
-            log.info("У пользователя нет друзей");
-            return Collections.emptyList();
-        }
-        for (long friendId : user.getFriends().keySet()) {
-            friends.add(getUser(friendId));
-        }
-        log.info("Друзья получены");
-        return friends;
+    public List<User> getFriends(long id) {
+        return friendsStorage.getFriendsByUserId(id);
     }
 
     public User getUser(long id) {
-        return storage.getUser(id);
+        Optional<User> user = storage.getUser(id);
+        if (user.isPresent()) {
+            return user.get();
+        }
+        throw new NotFoundDataException();
     }
 
     public List<User> findAll() {

@@ -1,14 +1,11 @@
-package ru.yandex.practicum.filmorate.storage.film;
+package ru.yandex.practicum.filmorate.dao.film;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.UpdateException;
 import ru.yandex.practicum.filmorate.models.Film;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 @Slf4j
@@ -45,13 +42,13 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film getFilm(long id) {
+    public Optional<Film> getFilm(long id) {
         Film film = films.get(id);
         if (film == null) {
             log.error("Фильм не найден");
             throw new NullPointerException("Фильм не найден");
         }
         log.info("Фильм найден");
-        return film;
+        return Optional.of(film);
     }
 }
