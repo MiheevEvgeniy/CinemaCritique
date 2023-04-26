@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,13 +26,13 @@ public class FilmServiceTest {
     private final UserService userService;
     private final LikesStorage likesStorage;
 
-    Film film1;
-    Film film2;
-    Film film3;
-    User user1;
+    static Film film1;
+    static Film film2;
+    static Film film3;
+    static User user1;
 
-    @BeforeEach
-    public void updateTestData() {
+    @BeforeAll
+    public static void updateTestData() {
         film1 = Film.builder()
                 .id(1)
                 .name("film1")

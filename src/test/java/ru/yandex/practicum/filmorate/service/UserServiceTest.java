@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,13 +21,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class UserServiceTest {
 
     private final UserService userService;
-    User user1;
-    User user2;
-    User user3;
-    User user4;
+    static User user1;
+    static User user2;
+    static User user3;
+    static User user4;
 
-    @BeforeEach
-    public void updateTestData() {
+    @BeforeAll
+    public static void updateTestData() {
 
         user1 = User.builder()
                 .id(1)
