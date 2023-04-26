@@ -73,18 +73,18 @@ public class FilmServiceTest {
         filmService.add(film1);
         filmService.add(film2);
         List<Film> films = filmService.findAll();
-        assertTrue(films.size()>0);
+        assertTrue(films.size() > 0);
     }
 
     @Test
     public void updatingFilm() {
         List<Film> films = filmService.findAll();
-        assertTrue(films.size()>0);
+        assertTrue(films.size() > 0);
 
         Film filmNotUpdated = filmService.getFilm(film3.getId());
         filmService.update(film3);
 
-        assertTrue(films.size()>0);
+        assertTrue(films.size() > 0);
         assertNotEquals(filmNotUpdated, filmService.getFilm(film3.getId()));
 
     }
