@@ -34,8 +34,7 @@ public class FriendsDbStorage implements FriendsStorage {
         String friendsRows = "INSERT INTO friends (" +
                 "friend_id," +
                 "user_id) " +
-                "VALUES (?,?) " +
-                "ON CONFLICT DO NOTHING";
+                "VALUES (?,?) ";
         jdbcTemplate.update(friendsRows, friendId, userId);
     }
 

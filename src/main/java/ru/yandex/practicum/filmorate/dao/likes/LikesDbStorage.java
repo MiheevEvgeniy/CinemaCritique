@@ -48,8 +48,7 @@ public class LikesDbStorage implements LikesStorage {
         String likesRows = "INSERT INTO film_liked_users (" +
                 "film_id," +
                 "user_id) " +
-                "VALUES (?,?) " +
-                "ON CONFLICT DO NOTHING";
+                "VALUES (?,?) ";
         jdbcTemplate.update(likesRows, filmId, userId);
         log.info("Добавление лайка выполнено");
     }
