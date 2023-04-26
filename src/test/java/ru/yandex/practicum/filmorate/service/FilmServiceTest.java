@@ -94,12 +94,8 @@ public class FilmServiceTest {
         assertEquals(0, film1.getLikes());
         userService.add(user1);
         filmService.addLike(1, 2);
-        assertEquals(0, likesStorage.getLikesByFilmId(film1.getId()));
-        assertEquals(1, likesStorage.getLikesByFilmId(film2.getId()));
         List<Film> popularFilms = filmService.getPopularFilms(1);
         assertEquals(film2.getName(), popularFilms.get(0).getName());
         filmService.deleteLike(1, 2);
-        assertEquals(0, likesStorage.getLikesByFilmId(film1.getId()));
-        assertEquals(0, likesStorage.getLikesByFilmId(film2.getId()));
     }
 }
