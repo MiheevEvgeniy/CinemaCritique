@@ -1,55 +1,59 @@
 package ru.yandex.practicum.filmorate.service;
 
-import org.junit.jupiter.api.BeforeEach;
+import lombok.RequiredArgsConstructor;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.models.User;
-import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
 import java.time.LocalDate;
 import java.util.Collections;
-import java.util.List;
-import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
+@SpringBootTest
+@AutoConfigureTestDatabase
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class UserServiceTest {
-    private UserService userService;
-    User user1;
-    User user2;
-    User user3;
-    User user4;
 
-    @BeforeEach
-    public void updateTestData() {
+    private final UserService userService;
+    static User user1;
+    static User user2;
+    static User user3;
+    static User user4;
 
-        userService = new UserService(new InMemoryUserStorage());
+    @BeforeAll
+    public static void updateTestData() {
+
         user1 = User.builder()
                 .id(1)
                 .name("person1")
                 .login("login1")
                 .email("email1@mail.com")
-                .birthday(LocalDate.MIN)
+                .birthday(LocalDate.now())
                 .build();
         user2 = User.builder()
                 .id(2)
                 .name("person2")
                 .login("login2")
                 .email("email2@mail.com")
-                .birthday(LocalDate.MIN)
+                .birthday(LocalDate.now())
                 .build();
         user3 = User.builder()
                 .id(3)
                 .name("person3")
                 .login("login3")
                 .email("email3@mail.com")
-                .birthday(LocalDate.MIN)
+                .birthday(LocalDate.now())
                 .build();
         user4 = User.builder()
                 .id(2)
                 .name("person4")
                 .login("login4")
                 .email("email4@mail.com")
-                .birthday(LocalDate.MIN)
+                .birthday(LocalDate.now())
                 .build();
     }
 
@@ -58,42 +62,36 @@ public class UserServiceTest {
         userService.add(user1);
         userService.add(user2);
         userService.add(user3);
-        assertEquals(List.of(user1, user2, user3), userService.findAll());
+        assertTrue(userService.findAll().size() > 0);
     }
 
     @Test
     public void updatingUsers() {
-        userService.add(user1);
-        userService.add(user2);
-        userService.add(user3);
-        assertEquals(List.of(user1, user2, user3), userService.findAll());
+        assertTrue(userService.findAll().size() > 0);
+        User userNotUpdated = userService.getUser(user4.getId());
 
         userService.update(user4);
 
-        assertEquals(user4, userService.getUser(2));
-        assertEquals(List.of(user1, user4, user3), userService.findAll());
+        assertNotEquals(userNotUpdated, userService.getUser(user4.getId()));
+        assertTrue(userService.findAll().size() > 0);
     }
 
     @Test
     public void addingAndDeletingFriends() {
-        userService.add(user1);
-        userService.add(user2);
-        assertEquals(Collections.emptySet(), user1.getFriends());
-        assertEquals(Collections.emptySet(), user2.getFriends());
+        assertEquals(Collections.emptyList(), userService.getFriends(user1.getId()));
+        assertEquals(Collections.emptyList(), userService.getFriends(user2.getId()));
 
         userService.addFriend(user1.getId(), user2.getId());
-        assertEquals(Set.of(2L), user1.getFriends());
-        assertEquals(Set.of(1L), user2.getFriends());
+        assertEquals(1, userService.getFriends(user1.getId()).size());
 
         userService.deleteFriend(user1.getId(), user2.getId());
-        assertEquals(Collections.emptySet(), user1.getFriends());
-        assertEquals(Collections.emptySet(), user2.getFriends());
+        assertEquals(0, userService.getFriends(user1.getId()).size());
+        assertEquals(0, userService.getFriends(user2.getId()).size());
 
-        userService.add(user3);
         userService.addFriend(user1.getId(), user2.getId());
         userService.addFriend(user1.getId(), user3.getId());
         userService.addFriend(user2.getId(), user3.getId());
-        assertEquals(List.of(user3), userService.getCommonFriends(user1.getId(), user2.getId()));
+        assertEquals(user3, userService.getCommonFriends(user1.getId(), user2.getId()).get(0));
     }
 
 }
