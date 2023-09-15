@@ -1,4 +1,11 @@
-# java-filmorate
+<h1>Filmorate</h1>
+<h3>Стек:</h3>
+<ul>
+  <li>JavaCore</li>
+  <li>Git</li>
+  <li>Spring Boot</li>
+  <li>Hibernate</li>
+</ul>
 ER-diagram для проекта:<br/>
 ![ERD-filmorate.png](src%2Fmain%2Fresources%2FER-diagram.png)<br/>
 URL: https://app.quickdatabasediagrams.com/#/d/KW9QbH
