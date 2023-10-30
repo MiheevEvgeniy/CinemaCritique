@@ -4,7 +4,7 @@
   <li>JavaCore</li>
   <li>Git</li>
   <li>Spring Boot</li>
-  <li>Hibernate</li>
+  <li>JDBC</li>
 </ul>
 ER-diagram для проекта:<br/>
 ![ERD-filmorate.png](src%2Fmain%2Fresources%2FER-diagram.png)<br/>
