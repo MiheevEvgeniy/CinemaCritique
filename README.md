@@ -1,4 +1,4 @@
-<h1>Filmorate</h1>
+<h1>CinemaCritique</h1>
 <h3>Стек:</h3>
 <ul>
   <li>JavaCore</li>
